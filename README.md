@@ -49,11 +49,11 @@ Number and name of feature: Implement Movies API Call
 
 Estimate of time needed to complete: 60mins
 
-Start time: ____
+Start time: 0915
 
-Finish time: ____
+Finish time: 1045
 
-Actual time needed to complete: ____
+Actual time needed to complete: 90mins
 ```
 ```
 Number and name of feature: Implement Yelp API Call

@@ -69,13 +69,13 @@ Actual time needed to complete: 105min
 ```
 Number and name of feature: Implement Cache Invalidation
 
-Estimate of time needed to complete: ____
+Estimate of time needed to complete: 60min
 
-Start time: ____
+Start time: 12:30
 
-Finish time: ____
+Finish time: 14:05
 
-Actual time needed to complete: ____
+Actual time needed to complete: 95mins
 ```
 ```
 Number and name of feature: Implement Trails API Calls

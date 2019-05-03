@@ -20,7 +20,7 @@ From the terminal, run one of the following to make a local copy:
 
 ### Usage:
 * In the CLI, run: `$ node server.js`
-* Or go to: []()
+* Or go to: [https://still-caverns-25372.herokuapp.com/](https://still-caverns-25372.herokuapp.com/)
 
 
 ## Architecture

@@ -58,13 +58,13 @@ Actual time needed to complete: 90mins
 ```
 Number and name of feature: Implement Yelp API Call
 
-Estimate of time needed to complete: ____
+Estimate of time needed to complete: 60min
 
-Start time: ____
+Start time: 1045
 
-Finish time: ____
+Finish time: 1230
 
-Actual time needed to complete: ____
+Actual time needed to complete: 105min
 ```
 ```
 Number and name of feature: Implement Cache Invalidation

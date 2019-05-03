@@ -25,6 +25,7 @@ app.get('/location', getLocation);
 app.get('/weather', getWeather);
 app.get('/events', getEvents);
 app.get('/movies', getMovies);
+app.get('/yelp', getYelps);
 
 // Make sure the server is listening for requests
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
@@ -135,7 +136,7 @@ function Movie(movie) {
   this.image_url = `https://image.tmdb.org/t/p/w185_and_h278_bestv2${movie.poster_path}`
   this.popularity = movie.popularity;
   this.released_on = movie.release_date;
-};
+}
 
 Movie.tableName = 'movies';
 Movie.lookup = lookup;
@@ -144,6 +145,27 @@ Movie.prototype = {
   save: function (location_id) {
     const SQL = `INSERT INTO ${this.tableName} (title, overview, average_votes, image_url, popularity, released_on, location_id) VALUES ($1, $2, $3, $4, $5, $6, $7);`;
     const values = [this.title, this.overview, this.average_votes, this.image_url, this.popularity, this.released_on, location_id];
+
+    client.query(SQL, values);
+  }
+};
+
+function Yelp(review) {
+  this.tableName = 'yelps';
+  this.name = review.name;
+  this.image_url = review.image_url;
+  this.price = review.price;
+  this.rating = review.rating;
+  this.url = review.url;
+}
+
+Yelp.tableName = 'yelps';
+Yelp.lookup = lookup;
+
+Yelp.prototype = {
+  save: function (location_id) {
+    const SQL = `INSERT INTO ${this.tableName} (name, image_url, price, rating, url, location_id) VALUES ($1, $2, $3, $4, $5, $6);`;
+    const values = [this.name, this.img_url, this.price, this.rating, this.url, location_id];
 
     client.query(SQL, values);
   }
@@ -255,3 +277,35 @@ function getMovies(request, response) {
     }
   });
 }
+
+function getYelps(request, response) {
+  Yelp.lookup({
+    tableName: Yelp.tableName,
+
+    location: request.query.data.id,
+
+    cacheHit: function (result) {
+      response.send(result.rows);
+    },
+
+    cacheMiss: function () {
+      const url = `https://api.yelp.com/v3/businesses/search?location=${request.query.data.search_query}`
+
+      superagent.get(url)
+        .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`)
+        .then(result => {
+          const yelps = result.body.businesses.map(yelpData => {
+            const yelp = new Yelp(yelpData);
+            yelp.save(request.query.data.id);
+            return yelp;
+          });
+
+          response.send(yelps);
+        })
+        .catch(error => handleError(error, response));
+    }
+  });
+}
+
+
+

@@ -173,7 +173,7 @@ Yelp.lookup = lookup;
 Yelp.prototype = {
   save: function (location_id) {
     const SQL = `INSERT INTO ${this.tableName} (name, image_url, price, rating, url, created_at, location_id) VALUES ($1, $2, $3, $4, $5, $6, $7);`;
-    const values = [this.name, this.img_url, this.price, this.rating, this.url, this.created_at, location_id];
+    const values = [this.name, this.image_url, this.price, this.rating, this.url, this.created_at, location_id];
 
     client.query(SQL, values);
   }

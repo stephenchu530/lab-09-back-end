@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS weathers (
     id SERIAL PRIMARY KEY,
     forecast VARCHAR(255),
     time VARCHAR(255),
+    created_at VARCHAR(255),
     location_id INTEGER NOT NULL REFERENCES locations(id)
   );
 
@@ -27,6 +28,7 @@ CREATE TABLE IF NOT EXISTS events (
   name VARCHAR(255),
   summary VARCHAR(1000),
   event_date CHAR(15),
+  created_at VARCHAR(255),
   location_id INTEGER NOT NULL REFERENCES locations(id)
 );
 
@@ -38,6 +40,7 @@ CREATE TABLE IF NOT EXISTS movies (
   image_url VARCHAR(255),
   popularity NUMERIC(10, 7),
   released_on CHAR(10),
+  created_at VARCHAR(255),
   location_id INTEGER NOT NULL REFERENCES locations(id)
 );
 
@@ -48,5 +51,6 @@ CREATE TABLE IF NOT EXISTS yelps (
   price CHAR(5),
   rating NUMERIC(10, 7),
   url VARCHAR(255),
+  created_at VARCHAR(255),
   location_id INTEGER NOT NULL REFERENCES locations(id)
 );

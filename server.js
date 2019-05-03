@@ -45,7 +45,12 @@ function lookup(options) {
   client.query(SQL, values)
     .then(result => {
       if (result.rowCount > 0) {
-        options.cacheHit(result);
+        if (Date.now() - result.rows[0].created_at > timeouts[options.tableName]) {
+          deleteRecords(options.tableName, options.location);
+          options.cacheMiss();
+        } else {
+          options.cacheHit(result);
+        }
       } else {
         options.cacheMiss();
       }
@@ -93,7 +98,7 @@ Location.prototype = {
 function Weather(day) {
   this.tableName = 'weathers';
   this.forecast = day.summary;
-  this.time = new Date(day.time * 1000).toString().slice(0, 15);
+  this.created_at = Date.now();
 }
 
 Weather.tableName = 'weathers';
@@ -101,8 +106,8 @@ Weather.lookup = lookup;
 
 Weather.prototype = {
   save: function (location_id) {
-    const SQL = `INSERT INTO ${this.tableName} (forecast, time, location_id) VALUES ($1, $2, $3);`;
-    const values = [this.forecast, this.time, location_id];
+    const SQL = `INSERT INTO ${this.tableName} (forecast, time, created_at, location_id) VALUES ($1, $2, $3, $4);`;
+    const values = [this.forecast, this.time, this.created_at, location_id];
 
     client.query(SQL, values);
   }
@@ -114,6 +119,7 @@ function Event(event) {
   this.name = event.name.text;
   this.event_date = new Date(event.start.local).toString().slice(0, 15);
   this.summary = event.summary;
+  this.created_at = Date.now();
 }
 
 Event.tableName = 'events';
@@ -121,8 +127,8 @@ Event.lookup = lookup;
 
 Event.prototype = {
   save: function (location_id) {
-    const SQL = `INSERT INTO ${this.tableName} (link, name, event_date, summary, location_id) VALUES ($1, $2, $3, $4, $5);`;
-    const values = [this.link, this.name, this.event_date, this.summary, location_id];
+    const SQL = `INSERT INTO ${this.tableName} (link, name, event_date, summary, created_at, location_id) VALUES ($1, $2, $3, $4, $5, $6);`;
+    const values = [this.link, this.name, this.event_date, this.summary, this.created_at, location_id];
 
     client.query(SQL, values);
   }
@@ -136,6 +142,7 @@ function Movie(movie) {
   this.image_url = `https://image.tmdb.org/t/p/w185_and_h278_bestv2${movie.poster_path}`
   this.popularity = movie.popularity;
   this.released_on = movie.release_date;
+  this.created_at = Date.now();
 }
 
 Movie.tableName = 'movies';
@@ -143,8 +150,8 @@ Movie.lookup = lookup;
 
 Movie.prototype = {
   save: function (location_id) {
-    const SQL = `INSERT INTO ${this.tableName} (title, overview, average_votes, image_url, popularity, released_on, location_id) VALUES ($1, $2, $3, $4, $5, $6, $7);`;
-    const values = [this.title, this.overview, this.average_votes, this.image_url, this.popularity, this.released_on, location_id];
+    const SQL = `INSERT INTO ${this.tableName} (title, overview, average_votes, image_url, popularity, released_on, created_at, location_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);`;
+    const values = [this.title, this.overview, this.average_votes, this.image_url, this.popularity, this.released_on, this.created_at, location_id];
 
     client.query(SQL, values);
   }
@@ -157,6 +164,7 @@ function Yelp(review) {
   this.price = review.price;
   this.rating = review.rating;
   this.url = review.url;
+  this.created_at = Date.now();
 }
 
 Yelp.tableName = 'yelps';
@@ -164,12 +172,23 @@ Yelp.lookup = lookup;
 
 Yelp.prototype = {
   save: function (location_id) {
-    const SQL = `INSERT INTO ${this.tableName} (name, image_url, price, rating, url, location_id) VALUES ($1, $2, $3, $4, $5, $6);`;
-    const values = [this.name, this.img_url, this.price, this.rating, this.url, location_id];
+    const SQL = `INSERT INTO ${this.tableName} (name, image_url, price, rating, url, created_at, location_id) VALUES ($1, $2, $3, $4, $5, $6, $7);`;
+    const values = [this.name, this.img_url, this.price, this.rating, this.url, this.created_at, location_id];
 
     client.query(SQL, values);
   }
 };
+
+
+// Model time outs
+const timeouts = {
+  'weathers': 15 * 1000,
+  'events': 15 * 1000,
+  'movies': 15 * 1000,
+  'yelps': 15 * 1000,
+};
+
+// Get Functions
 
 function getLocation(request, response) {
   Location.lookupLocation({
@@ -307,5 +326,15 @@ function getYelps(request, response) {
   });
 }
 
+function checkTimeout(tableName, locationID) {
+  const SQL = `SELECT created_at FROM ${tableName} WHERE location_id = ${locationID}`;
 
+  let createdTimes = client.query(SQL);
+  console.log(createdTimes[0]);
+}
 
+function deleteRecords(tableName, locationID) {
+  const SQL = `DELETE FROM ${tableName} WHERE location_id = ${locationID}`;
+
+  client.query(SQL);
+}

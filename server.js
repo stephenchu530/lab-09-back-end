@@ -98,6 +98,7 @@ Location.prototype = {
 function Weather(day) {
   this.tableName = 'weathers';
   this.forecast = day.summary;
+  this.time = new Date(day.time * 1000).toString().slice(0, 15);
   this.created_at = Date.now();
 }
 

@@ -43,6 +43,7 @@ CREATE TABLE movies (
   title VARCHAR(255),
   overview VARCHAR(1000),
   average_votes NUMERIC,
+  total_votes NUMERIC,
   image_url VARCHAR(255),
   popularity NUMERIC,
   released_on CHAR(10),
